@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sesharao Nuthalapati — 3D Animator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+
+:root{
+  --bg:#04040a;
+  --panel:#0a0a14;
+  --card:#0e0e1a;
+  --border:#ffffff0f;
+  --gold:#f0b429;
+  --gold2:#ffda85;
+  --text:#dde0f0;
+  --muted:#6e7191;
+  --white:#ffffff;
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Outfit',sans-serif;
+  overflow-x:hidden;
+  cursor:none;
+}
+
+/* ── CURSOR ── */
+#cur,#cur2{position:fixed;border-radius:50%;pointer-events:none;z-index:9999;top:0;left:0}
+#cur{width:10px;height:10px;background:var(--gold);mix-blend-mode:difference}
+#cur2{width:34px;height:34px;border:1px solid var(--gold);opacity:.45;transition:all .25s ease}
+
+/* ── PROGRESS BAR ── */
+#prog{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--gold2));z-index:500;transition:width .08s linear}
+
+/* ── NOISE TEXTURE ── */
+body::after{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:800;opacity:.6;
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;width:100%;z-index:400;
+  padding:1.2rem 5vw;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(4,4,10,.8);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.4rem;letter-spacing:.12em;
+  color:var(--gold);
+}
+.nav-links{display:flex;gap:2.2rem;list-style:none}
+.nav-links a{
+  font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;transition:color .2s;
+}
+.nav-links a:hover{color:var(--gold)}
+.nav-hire{
+  background:var(--gold);color:#000;
+  padding:.5rem 1.5rem;
+  font-family:'Outfit',sans-serif;font-weight:700;
+  font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;
+  text-decoration:none;transition:box-shadow .2s,transform .2s;
+}
+.nav-hire:hover{box-shadow:0 6px 28px rgba(240,180,41,.4);transform:translateY(-2px)}
+
+/* ── HERO ── */
+#home{
+  min-height:100vh;
+  display:grid;grid-template-columns:1fr 1fr;
+  align-items:center;
+  padding:8rem 5vw 5rem;
+  position:relative;overflow:hidden;
+  gap:4rem;
+}
+/* animated grid bg */
+#home::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(240,180,41,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(240,180,41,.04) 1px,transparent 1px);
+  background-size:60px 60px;
+  animation:gridMove 20s linear infinite;
+}
+@keyframes gridMove{from{background-position:0 0}to{background-position:60px 60px}}
+
+/* glowing orbs */
+.orb{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;animation:orb 9s ease-in-out infinite}
+.o1{width:480px;height:480px;background:rgba(240,180,41,.11);top:-80px;right:-80px}
+.o2{width:320px;height:320px;background:rgba(90,60,200,.12);bottom:0;left:10%;animation-delay:-4s}
+.o3{width:200px;height:200px;background:rgba(240,180,41,.08);top:40%;left:5%;animation-delay:-7s}
+@keyframes orb{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-28px) scale(1.04)}}
+
+.hero-left{position:relative;z-index:2}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:.5rem;
+  border:1px solid rgba(240,180,41,.35);
+  padding:.38rem 1rem;margin-bottom:1.8rem;
+  font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);
+  animation:fadeUp .8s ease both;
+}
+.hero-badge span{width:6px;height:6px;background:var(--gold);border-radius:50%;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+
+.hero-name{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(4rem,9vw,9rem);
+  line-height:.9;letter-spacing:.02em;
+  animation:fadeUp .8s .08s ease both;
+}
+.hero-name .line2{
+  -webkit-text-stroke:1.5px var(--text);
+  color:transparent;
+}
+.hero-name .gold{color:var(--gold)}
+
+.hero-title{
+  font-size:1rem;font-weight:500;
+  color:var(--muted);letter-spacing:.2em;text-transform:uppercase;
+  margin-top:1.2rem;
+  animation:fadeUp .8s .16s ease both;
+}
+
+.hero-desc{
+  font-size:.92rem;line-height:1.9;color:var(--muted);
+  max-width:420px;margin-top:1.4rem;
+  animation:fadeUp .8s .22s ease both;
+}
+
+.hero-btns{
+  display:flex;gap:1rem;margin-top:2rem;
+  animation:fadeUp .8s .3s ease both;
+}
+.btn-gold{
+  background:var(--gold);color:#000;
+  padding:.78rem 2rem;font-weight:700;
+  font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;
+  text-decoration:none;transition:transform .2s,box-shadow .2s;display:inline-block;
+}
+.btn-gold:hover{transform:translateY(-3px);box-shadow:0 10px 35px rgba(240,180,41,.4)}
+.btn-outline{
+  border:1px solid var(--border);color:var(--text);
+  padding:.78rem 2rem;font-weight:500;
+  font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;
+  text-decoration:none;transition:border-color .2s,color .2s;display:inline-block;
+}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+
+/* hero photo */
+.hero-right{
+  position:relative;z-index:2;
+  display:flex;align-items:center;justify-content:center;
+  animation:fadeUp .8s .1s ease both;
+}
+.photo-frame{
+  position:relative;width:340px;height:400px;
+  flex-shrink:0;
+}
+.photo-frame img{
+  width:100%;height:100%;object-fit:cover;
+  display:block;
+  border:1px solid var(--border);
+  position:relative;z-index:2;
+}
+.photo-border{
+  position:absolute;
+  border:1px solid rgba(240,180,41,.4);
+  top:16px;left:16px;right:-16px;bottom:-16px;
+  z-index:1;
+}
+.photo-tag{
+  position:absolute;bottom:-20px;left:-20px;z-index:3;
+  background:var(--gold);color:#000;
+  padding:.6rem 1.2rem;
+  font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.08em;
+}
+.float-badge{
+  position:absolute;top:-18px;right:-24px;z-index:3;
+  background:var(--card);border:1px solid var(--border);
+  padding:.9rem 1.2rem;text-align:center;
+  animation:float 5s ease-in-out infinite;
+}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.float-badge strong{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--gold);display:block;line-height:1}
+.float-badge span{font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── STATS STRIP ── */
+.stats-strip{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  background:var(--panel);
+}
+.stat{
+  padding:2.5rem 2rem;text-align:center;
+  border-right:1px solid var(--border);
+  transition:background .3s;position:relative;overflow:hidden;
+}
+.stat:last-child{border-right:none}
+.stat::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:var(--gold);transform:scaleX(0);transition:transform .4s ease;
+}
+.stat:hover{background:var(--card)}
+.stat:hover::after{transform:scaleX(1)}
+.stat-n{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:3.2rem;color:var(--gold);line-height:1;
+}
+.stat-l{font-size:.75rem;color:var(--muted);margin-top:.4rem;letter-spacing:.1em;text-transform:uppercase}
+
+/* ── SECTION SHARED ── */
+section{padding:7rem 5vw}
+.s-tag{font-size:.68rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:.8rem}
+.s-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(2.4rem,5vw,4.5rem);
+  letter-spacing:.03em;line-height:.95;margin-bottom:1.5rem;
+}
+.s-body{font-size:.9rem;line-height:1.9;color:var(--muted);max-width:500px}
+
+.reveal{opacity:0;transform:translateY(32px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:translateY(0)}
+
+/* ── ABOUT ── */
+#about{display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:center}
+.about-text .s-body{margin-bottom:1.5rem}
+.about-text p{font-size:.9rem;line-height:1.9;color:var(--muted);margin-bottom:1.2rem}
+.about-text strong{color:var(--text)}
+
+/* skills */
+.skills-block{margin-top:2.5rem}
+.skill-row{margin-bottom:1.2rem}
+.skill-top{display:flex;justify-content:space-between;margin-bottom:.5rem}
+.skill-label{font-size:.8rem;font-weight:600;letter-spacing:.06em}
+.skill-pct{font-size:.78rem;color:var(--gold);font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.06em}
+.skill-track{height:3px;background:var(--border);position:relative}
+.skill-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));width:0;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+
+/* about right visual */
+.about-visual{
+  background:var(--card);border:1px solid var(--border);
+  padding:3rem;display:flex;flex-direction:column;gap:1.5rem;
+  position:relative;overflow:hidden;
+}
+.about-visual::before{
+  content:'';position:absolute;top:-60px;right:-60px;
+  width:200px;height:200px;border-radius:50%;
+  background:rgba(240,180,41,.07);filter:blur(40px);
+}
+.exp-item{
+  border-left:2px solid var(--border);padding-left:1.5rem;
+  transition:border-color .3s;
+}
+.exp-item:hover{border-color:var(--gold)}
+.exp-period{font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:.3rem}
+.exp-role{font-weight:700;font-size:.92rem;margin-bottom:.2rem}
+.exp-company{font-size:.8rem;color:var(--muted);margin-bottom:.4rem}
+.exp-desc{font-size:.78rem;color:var(--muted);line-height:1.7}
+
+/* ── SERVICES ── */
+#services{background:var(--panel)}
+.srv-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1px;background:var(--border);
+  border:1px solid var(--border);margin-top:3.5rem;
+}
+.srv-card{
+  background:var(--bg);padding:2.8rem 2.2rem;
+  position:relative;overflow:hidden;transition:background .3s;
+}
+.srv-card:hover{background:var(--card)}
+.srv-num{font-family:'Bebas Neue',sans-serif;font-size:.85rem;color:var(--gold);letter-spacing:.2em;margin-bottom:1.5rem}
+.srv-icon{font-size:2.2rem;margin-bottom:1rem}
+.srv-name{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.04em;margin-bottom:.9rem;line-height:1}
+.srv-desc{font-size:.82rem;color:var(--muted);line-height:1.8}
+.srv-card::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--gold),transparent);
+  transform:scaleX(0);transform-origin:left;transition:transform .4s ease;
+}
+.srv-card:hover::after{transform:scaleX(1)}
+
+/* ── PORTFOLIO ── */
+#portfolio .port-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1.4rem;margin-top:3.5rem;
+}
+.port-card{
+  background:var(--card);border:1px solid var(--border);
+  overflow:hidden;position:relative;cursor:none;
+  transition:transform .35s ease,box-shadow .35s ease;
+}
+.port-card:hover{transform:translateY(-6px);box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.port-thumb{
+  aspect-ratio:16/10;
+  display:flex;align-items:center;justify-content:center;
+  font-size:4.5rem;position:relative;overflow:hidden;
+}
+.pt1{background:linear-gradient(135deg,#0d0d22,#1a0a3d,#2d1269)}
+.pt2{background:linear-gradient(135deg,#0a1a14,#0c3020,#1a5535)}
+.pt3{background:linear-gradient(135deg,#1a1208,#2d2010,#4a3818)}
+.port-thumb::before{
+  content:'PLAY ▶';
+  position:absolute;inset:0;
+  background:rgba(0,0,0,.6);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.2em;
+  color:var(--gold);opacity:0;transition:opacity .3s;
+  backdrop-filter:blur(4px);
+}
+.port-card:hover .port-thumb::before{opacity:1}
+.port-meta{padding:1.5rem}
+.port-title{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.06em;margin-bottom:.3rem}
+.port-sub{font-size:.75rem;color:var(--gold);letter-spacing:.14em;text-transform:uppercase}
+
+/* tools used */
+.tools-row{
+  display:flex;flex-wrap:wrap;gap:.6rem;margin-top:3rem;
+}
+.tool-chip{
+  font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;
+  padding:.38rem 1rem;border:1px solid var(--border);color:var(--muted);
+  transition:all .2s;
+}
+.tool-chip:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ── CONTACT ── */
+#contact{background:var(--panel)}
+.contact-wrap{
+  display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start;
+}
+.contact-info{padding-top:.5rem}
+.contact-detail{
+  display:flex;align-items:center;gap:1rem;
+  padding:1.2rem 0;border-bottom:1px solid var(--border);
+  font-size:.88rem;color:var(--muted);
+  transition:color .2s;
+}
+.contact-detail:hover{color:var(--text)}
+.contact-detail a{color:var(--gold);text-decoration:none;font-weight:500}
+.contact-detail a:hover{text-decoration:underline}
+.cd-icon{
+  width:40px;height:40px;border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;flex-shrink:0;
+  transition:border-color .2s,background .2s;
+}
+.contact-detail:hover .cd-icon{border-color:var(--gold);background:rgba(240,180,41,.08)}
+
+/* form */
+.c-form{display:flex;flex-direction:column;gap:1.2rem}
+.c-form input,.c-form textarea{
+  background:var(--card);border:1px solid var(--border);
+  color:var(--text);padding:1rem 1.2rem;
+  font-family:'Outfit',sans-serif;font-size:.88rem;
+  outline:none;resize:none;
+  transition:border-color .2s;
+}
+.c-form input::placeholder,.c-form textarea::placeholder{color:var(--muted)}
+.c-form input:focus,.c-form textarea:focus{border-color:var(--gold)}
+.c-form textarea{min-height:130px}
+.c-form button{
+  background:var(--gold);color:#000;border:none;
+  padding:1rem 2rem;font-family:'Outfit',sans-serif;font-weight:700;
+  font-size:.82rem;letter-spacing:.12em;text-transform:uppercase;
+  cursor:none;transition:transform .2s,box-shadow .2s;
+  text-align:left;display:flex;align-items:center;justify-content:space-between;
+}
+.c-form button:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(240,180,41,.35)}
+
+/* ── FOOTER ── */
+footer{
+  border-top:1px solid var(--border);
+  padding:2rem 5vw;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;
+}
+.f-logo{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.12em;color:var(--gold)}
+.f-copy{font-size:.73rem;color:var(--muted)}
+.f-socials{display:flex;gap:1.2rem}
+.f-socials a{
+  font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;transition:color .2s;
+}
+.f-socials a:hover{color:var(--gold)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  nav{padding:1rem 4vw}
+  .nav-links{display:none}
+  #home{grid-template-columns:1fr;padding:7rem 5vw 4rem;gap:3rem}
+  .hero-right{order:-1}
+  .photo-frame{width:260px;height:310px}
+  .stats-strip{grid-template-columns:repeat(2,1fr)}
+  .stat{border-right:none;border-bottom:1px solid var(--border)}
+  #about{grid-template-columns:1fr}
+  .srv-grid{grid-template-columns:1fr 1fr}
+  #portfolio .port-grid{grid-template-columns:1fr 1fr}
+  .contact-wrap{grid-template-columns:1fr}
+}
+@media(max-width:580px){
+  .srv-grid{grid-template-columns:1fr}
+  #portfolio .port-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div id="prog"></div>
+<div id="cur"></div>
+<div id="cur2"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Sesharao.N</div>
+  <ul class="nav-links">
+    <li><a href="#home">Home</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#portfolio">Portfolio</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="mailto:seshunuthalapati143@gmail.com" class="nav-hire">Hire Me</a>
+</nav>
+
+<!-- HERO -->
+<section id="home">
+  <div class="orb o1"></div>
+  <div class="orb o2"></div>
+  <div class="orb o3"></div>
+
+  <div class="hero-left">
+    <div class="hero-badge"><span></span>Available for Freelance Projects</div>
+    <h1 class="hero-name">
+      SESHA<br>
+      <span class="line2">RAO</span><br>
+      <span class="gold">NUTHALAPATI</span>
+    </h1>
+    <p class="hero-title">3D Animator &amp; Motion Artist</p>
+    <p class="hero-desc">5+ years bringing characters, products, and worlds to life using Maya, Blender, Unreal Engine &amp; Nuke. From indie films to commercial VFX.</p>
+    <div class="hero-btns">
+      <a href="#portfolio" class="btn-gold">View My Reel →</a>
+      <a href="#contact" class="btn-outline">Get in Touch</a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="photo-frame">
+      <img src="https://i.ibb.co/9m3kw4T0/4fc3e92e-d5b4-495d-8855-b464321ce348.jpg"
+           alt="Sesharao Nuthalapati"
+           onerror="this.style.display='none';this.parentElement.querySelector('.photo-fallback').style.display='flex'">
+      <div class="photo-fallback" style="display:none;width:100%;height:100%;background:var(--card);align-items:center;justify-content:center;font-size:6rem;border:1px solid var(--border)">🎨</div>
+      <div class="photo-border"></div>
+      <div class="photo-tag">3D ANIMATOR</div>
+      <div class="float-badge">
+        <strong>5.3+</strong>
+        <span>Years Exp.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-strip">
+  <div class="stat reveal">
+    <div class="stat-n" data-target="5.3">0</div>
+    <div class="stat-l">Years Experience</div>
+  </div>
+  <div class="stat reveal">
+    <div class="stat-n" data-target="20">0</div>
+    <div class="stat-l">Projects Completed</div>
+  </div>
+  <div class="stat reveal">
+    <div class="stat-n" data-target="1500">0</div>
+    <div class="stat-l">Working Hours</div>
+  </div>
+  <div class="stat reveal">
+    <div class="stat-n" data-target="10">0</div>
+    <div class="stat-l">Clients Served</div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-text reveal">
+    <p class="s-tag">About Me</p>
+    <h2 class="s-title">PASSIONATE<br>ANIMATOR</h2>
+    <p>I'm <strong>Sesharao Nuthalapati</strong> — a 3D Animator with over 5 years of hands-on experience in character animation, motion tracking, and VFX.</p>
+    <p>I specialise in industry-standard tools: <strong>Maya, Blender, Nuke, 3DEqualizer,</strong> and <strong>Unreal Engine.</strong> I've worked on films, indie games, commercials, and freelance gigs — delivering professional and engaging animation content across every medium.</p>
+
+    <div class="skills-block">
+      <div class="skill-row">
+        <div class="skill-top"><span class="skill-label">Maya</span><span class="skill-pct">95%</span></div>
+        <div class="skill-track"><div class="skill-fill" data-w="95"></div></div>
+      </div>
+      <div class="skill-row">
+        <div class="skill-top"><span class="skill-label">Blender</span><span class="skill-pct">85%</span></div>
+        <div class="skill-track"><div class="skill-fill" data-w="85"></div></div>
+      </div>
+      <div class="skill-row">
+        <div class="skill-top"><span class="skill-label">Unreal Engine</span><span class="skill-pct">80%</span></div>
+        <div class="skill-track"><div class="skill-fill" data-w="80"></div></div>
+      </div>
+      <div class="skill-row">
+        <div class="skill-top"><span class="skill-label">Nuke</span><span class="skill-pct">75%</span></div>
+        <div class="skill-track"><div class="skill-fill" data-w="75"></div></div>
+      </div>
+      <div class="skill-row">
+        <div class="skill-top"><span class="skill-label">3DEqualizer</span><span class="skill-pct">70%</span></div>
+        <div class="skill-track"><div class="skill-fill" data-w="70"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="about-visual reveal">
+    <p class="s-tag" style="margin-bottom:1.5rem">My Experience</p>
+    <div class="exp-item">
+      <div class="exp-period">Apr 2020 – Apr 2021</div>
+      <div class="exp-role">Jr. 3D Animator</div>
+      <div class="exp-company">Symbiosis Technologies</div>
+      <div class="exp-desc">Animation production pipelines — rigging, keyframing, and layout design using Maya.</div>
+    </div>
+    <div class="exp-item">
+      <div class="exp-period">May 2021 – Dec 2022</div>
+      <div class="exp-role">3D Animator</div>
+      <div class="exp-company">Hollywood Digital VFX Studios</div>
+      <div class="exp-desc">High-quality 3D character animations and facial expressions for short films and commercials using Maya, Nuke, Blender.</div>
+    </div>
+    <div class="exp-item">
+      <div class="exp-period">Jan 2023 – Jan 2024</div>
+      <div class="exp-role">3D Animator</div>
+      <div class="exp-company">Synergy Sparkles</div>
+      <div class="exp-desc">3D animation and rigging for product videos and training materials using Autodesk Maya and After Effects.</div>
+    </div>
+    <div class="exp-item">
+      <div class="exp-period">Jul 2024 – Present</div>
+      <div class="exp-role">Freelance 3D Animator</div>
+      <div class="exp-company">Fiverr</div>
+      <div class="exp-desc">Animation and VFX using Blender, Maya, and 3DEqualizer. Indie games, short films, motion tracking projects.</div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <p class="s-tag reveal">What I Do</p>
+  <h2 class="s-title reveal">MY SERVICES</h2>
+  <div class="srv-grid reveal">
+    <div class="srv-card">
+      <div class="srv-num">01</div>
+      <div class="srv-icon">🧍</div>
+      <div class="srv-name">Character Animation</div>
+      <div class="srv-desc">Expressive, fluid character animation with precise rigging and keyframe work. Films, games, and commercial content.</div>
+    </div>
+    <div class="srv-card">
+      <div class="srv-num">02</div>
+      <div class="srv-icon">🎬</div>
+      <div class="srv-name">VFX & Compositing</div>
+      <div class="srv-desc">Professional visual effects using Nuke and After Effects — seamlessly composited into live action or fully CG productions.</div>
+    </div>
+    <div class="srv-card">
+      <div class="srv-num">03</div>
+      <div class="srv-icon">📍</div>
+      <div class="srv-name">Motion Tracking</div>
+      <div class="srv-desc">Precision 3D camera tracking and matchmoving using 3DEqualizer — the same tool used in Hollywood productions.</div>
+    </div>
+    <div class="srv-card">
+      <div class="srv-num">04</div>
+      <div class="srv-icon">🎮</div>
+      <div class="srv-name">Game Animation</div>
+      <div class="srv-desc">Game-ready animations and assets built for Unreal Engine. Idle, walk, combat cycles and cinematic sequences.</div>
+    </div>
+    <div class="srv-card">
+      <div class="srv-num">05</div>
+      <div class="srv-icon">📦</div>
+      <div class="srv-name">Product Animation</div>
+      <div class="srv-desc">Cinematic product visualisation and commercial animation for brand campaigns and e-commerce platforms.</div>
+    </div>
+    <div class="srv-card">
+      <div class="srv-num">06</div>
+      <div class="srv-icon">🔗</div>
+      <div class="srv-name">Rigging & Setup</div>
+      <div class="srv-desc">Complete character and mechanical rigging for animation pipelines. Clean, efficient rigs built for production speed.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PORTFOLIO -->
+<section id="portfolio">
+  <p class="s-tag reveal">Selected Work</p>
+  <h2 class="s-title reveal">MY PORTFOLIO</h2>
+
+  <div class="port-grid reveal">
+    <div class="port-card">
+      <div class="port-thumb pt1">🎬</div>
+      <div class="port-meta">
+        <div class="port-title">Demo Reel 2024</div>
+        <div class="port-sub">Character Animation · VFX · Maya</div>
+      </div>
+    </div>
+    <div class="port-card">
+      <div class="port-thumb pt2">🎮</div>
+      <div class="port-meta">
+        <div class="port-title">Gaming Demo Reel</div>
+        <div class="port-sub">Game Animation · Unreal Engine</div>
+      </div>
+    </div>
+    <div class="port-card">
+      <div class="port-thumb pt3">⭐</div>
+      <div class="port-meta">
+        <div class="port-title">Fiverr Projects</div>
+        <div class="port-sub">Freelance · Blender · 3DEqualizer</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tools-row reveal">
+    <span class="tool-chip">Maya</span>
+    <span class="tool-chip">Blender</span>
+    <span class="tool-chip">Unreal Engine</span>
+    <span class="tool-chip">Nuke</span>
+    <span class="tool-chip">3DEqualizer</span>
+    <span class="tool-chip">After Effects</span>
+    <span class="tool-chip">ZBrush</span>
+    <span class="tool-chip">Substance Painter</span>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <p class="s-tag reveal">Get In Touch</p>
+  <h2 class="s-title reveal">CONTACT ME</h2>
+  <div class="contact-wrap">
+    <div class="contact-info reveal">
+      <div class="contact-detail">
+        <div class="cd-icon">📧</div>
+        <div>Email me at <a href="mailto:seshunuthalapati143@gmail.com">seshunuthalapati143@gmail.com</a></div>
+      </div>
+      <div class="contact-detail">
+        <div class="cd-icon">🌍</div>
+        <div>Available worldwide for remote projects &amp; collaborations</div>
+      </div>
+      <div class="contact-detail">
+        <div class="cd-icon">⚡</div>
+        <div>Freelance work via <a href="https://fiverr.com" target="_blank">Fiverr</a> — fast turnaround guaranteed</div>
+      </div>
+      <div class="contact-detail">
+        <div class="cd-icon">🎬</div>
+        <div>Open to full-time &amp; contract roles in animation &amp; VFX</div>
+      </div>
+    </div>
+
+    <form class="c-form reveal" onsubmit="handleForm(event)">
+      <input type="text" placeholder="Your Name" required>
+      <input type="email" placeholder="Your Email" required>
+      <input type="text" placeholder="Subject">
+      <textarea placeholder="Tell me about your project..."></textarea>
+      <button type="submit">
+        <span>Send Message</span>
+        <span>→</span>
+      </button>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="f-logo">Sesharao Nuthalapati</div>
+  <div class="f-copy">© 2025 · All Rights Reserved · 3D Animator</div>
+  <div class="f-socials">
+    <a href="mailto:seshunuthalapati143@gmail.com">Email</a>
+    <a href="#">Fiverr</a>
+    <a href="#">LinkedIn</a>
+    <a href="#">YouTube</a>
+  </div>
+</footer>
+
+<script>
+// CURSOR
+const cur=document.getElementById('cur'),cur2=document.getElementById('cur2');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
+(function loop(){
+  cur.style.cssText=`left:${mx-5}px;top:${my-5}px`;
+  rx+=(mx-rx-17)*.1;ry+=(my-ry-17)*.1;
+  cur2.style.cssText=`left:${rx}px;top:${ry}px`;
+  requestAnimationFrame(loop);
+})();
+document.querySelectorAll('a,button,.port-card,.srv-card,.stat,.exp-item').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.style.transform='scale(2.8)';cur2.style.transform='scale(.5)';cur2.style.opacity='.9'});
+  el.addEventListener('mouseleave',()=>{cur.style.transform='scale(1)';cur2.style.transform='scale(1)';cur2.style.opacity='.45'});
+});
+
+// PROGRESS BAR
+window.addEventListener('scroll',()=>{
+  const p=window.scrollY/(document.body.scrollHeight-innerHeight)*100;
+  document.getElementById('prog').style.width=p+'%';
+});
+
+// REVEAL ON SCROLL
+const io=new IntersectionObserver(entries=>{
+  entries.forEach((e,i)=>{
+    if(e.isIntersecting){
+      setTimeout(()=>e.target.classList.add('in'),i*90);
+      io.unobserve(e.target);
+    }
+  });
+},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(r=>io.observe(r));
+
+// SKILL BARS
+const skillIo=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.querySelectorAll('.skill-fill').forEach(f=>{
+        f.style.width=f.dataset.w+'%';
+      });
+      skillIo.unobserve(e.target);
+    }
+  });
+},{threshold:.3});
+document.querySelectorAll('.skills-block').forEach(b=>skillIo.observe(b));
+
+// COUNTER ANIMATION
+function animCount(el,target,suffix=''){
+  let cur=0;const inc=target/70;
+  const t=setInterval(()=>{
+    cur+=inc;
+    if(cur>=target){cur=target;clearInterval(t);}
+    el.textContent=Number.isInteger(target)?Math.floor(cur)+suffix:cur.toFixed(1)+suffix;
+  },18);
+}
+const cntIo=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const el=e.target.querySelector('.stat-n');
+      if(el){animCount(el,parseFloat(el.dataset.target),el.dataset.target.includes('.')?'':'+');}
+      cntIo.unobserve(e.target);
+    }
+  });
+},{threshold:.4});
+document.querySelectorAll('.stat').forEach(s=>cntIo.observe(s));
+
+// FORM
+function handleForm(e){
+  e.preventDefault();
+  const btn=e.target.querySelector('button');
+  btn.innerHTML='<span>Message Sent ✓</span><span>✓</span>';
+  btn.style.background='#2a9d5c';
+  setTimeout(()=>{
+    btn.innerHTML='<span>Send Message</span><span>→</span>';
+    btn.style.background='var(--gold)';
+    e.target.reset();
+  },3000);
+}
+</script>
+</body>
+</html>
